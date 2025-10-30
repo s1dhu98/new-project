@@ -1,0 +1,256 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>Smiling Emoji — Interactive CSS</title>
+	<style>
+		:root{
+			--bg-1: #0f172a;
+			--bg-2: #0b1220;
+			--accent: #ffd166;
+			--accent-2: #ff6b6b;
+			--emoji-size: 220px;
+			--face-color: var(--accent);
+		}
+
+		*{box-sizing:border-box}
+		html,body{height:100%}
+		body{
+			margin:0;
+			font-family: Inter, Roboto, -apple-system, "Segoe UI", "Helvetica Neue", Arial;
+			background: radial-gradient(1200px 600px at 10% 10%, rgba(255,255,255,0.02), transparent), linear-gradient(135deg,var(--bg-1),var(--bg-2));
+			color: #e6eef8;
+			display:flex;
+			align-items:center;
+			justify-content:center;
+			padding:32px;
+			-webkit-font-smoothing:antialiased;
+			-moz-osx-font-smoothing:grayscale;
+		}
+
+		main{max-width:1100px;width:100%;display:grid;grid-template-columns:1fr 380px;gap:32px;align-items:center}
+
+		.stage{
+			display:flex;align-items:center;justify-content:center;min-height:60vh;
+		}
+
+		/* The emoji face */
+		.emoji{
+			width:var(--emoji-size);
+			height:var(--emoji-size);
+			display:flex;
+			align-items:center;
+			justify-content:center;
+			transition:transform .35s cubic-bezier(.2,.9,.2,1);
+			outline: none;
+		}
+
+		.face{
+			width:100%;height:100%;border-radius:50%;background:var(--face-color);
+			box-shadow: 0 12px 30px rgba(2,6,23,0.6), inset 0 -12px 40px rgba(0,0,0,0.15);
+			position:relative;
+			display:flex;align-items:center;justify-content:center;flex-direction:column;
+			transform-origin:center center;
+		}
+
+		/* Eyes */
+		.eye{
+			width:18%;height:18%;background:#0b1220;border-radius:50%;box-shadow:0 6px 12px rgba(2,6,23,0.6);
+			transition:transform .12s ease, width .12s ease, height .12s ease;
+		}
+		.eyes{width:70%;display:flex;justify-content:space-between;align-items:center;margin-top:22%;}
+
+		/* mouth */
+		.mouth{
+			width:56%;height:36%;margin-top:8%;position:relative;display:block;
+			overflow:visible;
+		}
+		.mouth::before{
+			content:"";position:absolute;left:0;right:0;margin:auto;bottom:0;height:60%;width:100%;border-bottom-left-radius:60% 100%;border-bottom-right-radius:60% 100%;
+			background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.15));
+			transform:translateY(18%);
+		}
+
+		/* blush */
+		.blush{position:absolute;left:12%;top:58%;width:14%;height:10%;background:linear-gradient(90deg, rgba(255,107,107,0.18), rgba(255,107,107,0.06));border-radius:8px;filter:blur(.2px)}
+		.blush.right{left:auto;right:12%;}
+
+		/* interactive states */
+		.emoji:active{transform:scale(0.98)}
+		.pulse{animation:pulse 1.1s ease forwards}
+		@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+
+		/* wink & blink using a collapsed eye scaleY */
+		.eye.closing{transform:scaleY(.12)}
+
+		/* controls */
+		.controls{
+			background:rgba(255,255,255,0.03);padding:20px;border-radius:12px;backdrop-filter: blur(6px);
+			border:1px solid rgba(255,255,255,0.04);
+			box-shadow: 0 6px 20px rgba(2,6,23,0.6);
+		}
+		.controls h2{margin:0 0 12px 0;font-size:18px}
+		.controls .row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+		.controls label{font-size:14px;color:#cfe8ff;display:flex;gap:8px;align-items:center}
+		input[type=color]{width:48px;height:34px;border:0;background:transparent;padding:0}
+		input[type=range]{width:100%}
+		button{background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));color:#eaf6ff;border:0;padding:10px 12px;border-radius:8px;cursor:pointer}
+		button:active{transform:translateY(1px)}
+		.small{font-size:13px;color:#9fc8ff}
+
+		/* layout small screens */
+		@media (max-width:880px){
+			main{grid-template-columns:1fr;}
+			.controls{order:2;margin-top:18px}
+			.stage{min-height:46vh}
+		}
+
+		/* theme variations */
+		.theme-dark{--bg-1:#081226;--bg-2:#051224;--face-color:var(--accent)}
+		.theme-soft{--bg-1:#11233a;--bg-2:#08233f;--face-color:#ffdb9b}
+	</style>
+</head>
+<body>
+	<main>
+		<section class="stage">
+			<div class="emoji" id="emoji" tabindex="0" role="img" aria-label="Smiling face with friendly eyes">
+				<div class="face" id="face">
+					<div class="eyes">
+						<div class="eye left" id="eyeLeft" aria-hidden="true"></div>
+						<div class="eye right" id="eyeRight" aria-hidden="true"></div>
+					</div>
+					<div class="mouth" id="mouth" aria-hidden="true"></div>
+					<div class="blush left" aria-hidden="true"></div>
+					<div class="blush right" aria-hidden="true"></div>
+				</div>
+			</div>
+		</section>
+
+		<aside class="controls" aria-label="Emoji controls">
+			<h2>Customize your emoji</h2>
+			<div class="row">
+				<label for="colorPicker">Face</label>
+				<input id="colorPicker" type="color" value="#ffd166" aria-label="Face color picker">
+			</div>
+			<div class="row">
+				<label for="sizeRange">Size</label>
+				<input id="sizeRange" type="range" min="80" max="420" value="220" aria-label="Emoji size slider">
+			</div>
+			<div class="row">
+				<button id="winkBtn">Wink</button>
+				<button id="boomBtn">Animate</button>
+			</div>
+			<div class="row">
+				<label class="small"><input id="autoBlink" type="checkbox"> Auto-blink</label>
+				<button id="themeBtn">Toggle Theme</button>
+			</div>
+			<p class="small">Tip: Click or press Enter/Space on the face to animate. Use the controls to personalize color & size.</p>
+		</aside>
+	</main>
+
+	<script>
+		// Contract (brief): Inputs: color, size, wink/auto-blink toggles. Outputs: visual emoji updates.
+		// Simple edge cases: extremely small/large sizes are clamped by range input.
+
+		const emoji = document.getElementById('emoji');
+		const face = document.getElementById('face');
+		const eyeL = document.getElementById('eyeLeft');
+		const eyeR = document.getElementById('eyeRight');
+		const colorPicker = document.getElementById('colorPicker');
+		const sizeRange = document.getElementById('sizeRange');
+		const winkBtn = document.getElementById('winkBtn');
+		const boomBtn = document.getElementById('boomBtn');
+		const autoBlink = document.getElementById('autoBlink');
+		const themeBtn = document.getElementById('themeBtn');
+
+		// apply initial values
+		document.documentElement.style.setProperty('--face-color', colorPicker.value);
+		document.documentElement.style.setProperty('--emoji-size', sizeRange.value + 'px');
+
+		// color change
+		colorPicker.addEventListener('input', e=>{
+			document.documentElement.style.setProperty('--face-color', e.target.value);
+		});
+
+		// size change
+		sizeRange.addEventListener('input', e=>{
+			document.documentElement.style.setProperty('--emoji-size', e.target.value + 'px');
+		});
+
+		// wink: close right eye briefly
+		function wink(){
+			eyeR.classList.add('closing');
+			setTimeout(()=>eyeR.classList.remove('closing'), 420);
+		}
+
+		winkBtn.addEventListener('click', wink);
+
+		// simple animate 'boom' event
+		function boom(){
+			face.classList.remove('pulse');
+			// force reflow then add
+			void face.offsetWidth;
+			face.classList.add('pulse');
+		}
+		boomBtn.addEventListener('click', boom);
+
+		// clicking or keyboard activates small bounce
+		emoji.addEventListener('click', ()=>{ boom(); });
+		emoji.addEventListener('keydown', (e)=>{
+			if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); wink(); boom(); }
+		});
+
+		// blinking
+		let blinkInterval = null;
+		function blink(){
+			eyeL.classList.add('closing');
+			eyeR.classList.add('closing');
+			setTimeout(()=>{eyeL.classList.remove('closing');eyeR.classList.remove('closing');}, 160);
+		}
+		autoBlink.addEventListener('change', (e)=>{
+			if(e.target.checked){
+				if(blinkInterval) clearInterval(blinkInterval);
+				blinkInterval = setInterval(()=>{
+					// random short delay for naturalness
+					if(Math.random() > 0.25) blink();
+				}, 2500 + Math.random()*2000);
+			} else {
+				if(blinkInterval) clearInterval(blinkInterval);
+				blinkInterval = null;
+			}
+		});
+
+		// theme toggle
+		let theme = 0;
+		themeBtn.addEventListener('click', ()=>{
+			theme = (theme + 1) % 2;
+			if(theme === 0) document.documentElement.classList.remove('theme-soft');
+			else document.documentElement.classList.add('theme-soft');
+		});
+
+		// small accessibility: announce current color on change (visually hidden not present; we update aria-label)
+		colorPicker.addEventListener('input', ()=>{
+			emoji.setAttribute('aria-label', `Smiling face, color ${colorPicker.value}`);
+		});
+
+		// Ensure emoji is keyboard focusable
+		emoji.addEventListener('focus', ()=>{ emoji.style.boxShadow = '0 8px 30px rgba(0,0,0,0.45), 0 0 0 6px rgba(95,150,255,0.06)'; });
+		emoji.addEventListener('blur', ()=>{ emoji.style.boxShadow = 'none'; });
+
+		// small responsive tweak: reduce face detail at small sizes
+		const resizeObserver = new ResizeObserver(entries=>{
+			for(const e of entries){
+				const w = e.contentRect.width;
+				if(w < 140){ eyeL.style.width = eyeL.style.height = '14%'; eyeR.style.width = eyeR.style.height = '14%'; }
+				else { eyeL.style.width = eyeL.style.height = ''; eyeR.style.width = eyeR.style.height = ''; }
+			}
+		});
+		resizeObserver.observe(document.documentElement);
+
+		// quick demo: gentle initial animation
+		setTimeout(()=>{ boom(); }, 450);
+	</script>
+</body>
+</html>
