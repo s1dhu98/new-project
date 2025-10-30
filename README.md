@@ -17,3 +17,4 @@ Notes
 - It's responsive and adapts layout for small viewports.
 - If you want additional features (stick-out tongue, more expressions, or an SVG mouth), tell me and I can extend it.
 adding changes1
+adding change2
